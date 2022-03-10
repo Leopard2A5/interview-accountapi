@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestCreateClientError(t *testing.T) {
+func TestCreateAccountClientError(t *testing.T) {
 	input := AccountData{}
 	var clientError *ClientError
 
@@ -19,7 +19,7 @@ func TestCreateClientError(t *testing.T) {
 	}
 }
 
-func TestCreateHappyCase(t *testing.T) {
+func TestCreateAccountHappyCase(t *testing.T) {
 	input := newAccount()
 
 	resp, err := CreateAccount(&input)
