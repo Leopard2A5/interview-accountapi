@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestClientError(t *testing.T) {
+func TestCreateClientError(t *testing.T) {
 	input := AccountData{}
 	var clientError *ClientError
 
@@ -18,7 +18,7 @@ func TestClientError(t *testing.T) {
 	}
 }
 
-func Test(t *testing.T) {
+func TestCreateHappyCase(t *testing.T) {
 	country := "GB"
 	input := AccountData{
 		Type:           "accounts",
@@ -35,7 +35,12 @@ func Test(t *testing.T) {
 	}
 
 	resp, err := CreateAccount(&input)
-	t.Logf("'%#v', %v", resp, err)
+	if err != nil {
+		t.Fatalf("expected err to be nil, but got %v", err)
+	}
+	if resp.Version == nil {
+		t.Fatalf("expected response to be enriched by API")
+	}
 }
 
 func TestBuildUrlShouldCorrectlyConcat(t *testing.T) {
