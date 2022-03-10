@@ -21,6 +21,14 @@ services:
       - DATABASE-PASSWORD=123
     ports:
       - 8080:8080
+
+  client:
+    build: .
+    environment:
+      - BASEURL=http://accountapi:8080/v1
+    depends_on:
+      - accountapi
+
   postgresql:
     image: postgres:9.5-alpine
     healthcheck:
