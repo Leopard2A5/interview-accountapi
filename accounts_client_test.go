@@ -1,11 +1,22 @@
 package accounts
 
 import (
+	"errors"
 	"os"
 	"testing"
 
 	"github.com/google/uuid"
 )
+
+func TestClientError(t *testing.T) {
+	input := AccountData{}
+	var clientError *ClientError
+
+	_, err := CreateAccount(&input)
+	if !errors.As(err, &clientError) {
+		t.Fatalf("expected a clientError but got %T", err)
+	}
+}
 
 func Test(t *testing.T) {
 	country := "GB"
