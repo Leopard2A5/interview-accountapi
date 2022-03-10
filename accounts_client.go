@@ -38,6 +38,35 @@ func CreateAccount(input *AccountData) (*AccountData, error) {
 	return &ret, nil
 }
 
+// Fetch the account with the given uuid. If the account doesn't exist the function will return (nil, nil).
+func FetchAccount(accountId string) (*AccountData, error) {
+	path := fmt.Sprintf("/organisation/accounts/%v", accountId)
+
+	resp, err := http.Get(buildUrl(path))
+	if err != nil {
+		return nil, &ConnectionError{err}
+	}
+	defer resp.Body.Close()
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, &ConnectionError{err}
+	}
+
+	if resp.StatusCode == 200 {
+		ret := unmarshal(bytes)
+		return &ret, nil
+	}
+	if resp.StatusCode == 404 {
+		return nil, nil
+	}
+	if resp.StatusCode >= 500 {
+		return nil, &ServerError{StatusCode: resp.StatusCode, Message: string(bytes)}
+	}
+
+	return nil, fmt.Errorf("unexpected status code %d: %v", resp.StatusCode, string(bytes))
+}
+
 // builds a complete url from the env var BASEURL + the given path.
 // trailing / in baseUrl and leading / in path will be taken into account.
 func buildUrl(path string) string {
