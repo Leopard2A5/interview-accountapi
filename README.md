@@ -1,5 +1,21 @@
 # Form3 Take Home Exercise
 
+## About this submission
+This is my submission of the exercise described below. Run this with `docker-compose up --build` (--build to make sure you defintely have the latest version of the client) and look for the client_1 output, it will run `go test -v .` in a container.
+
+Note: I'm new to golang!
+
+### Assumptions
+I'm assuming that this exercise is a) about showing my ability to create a client that abstracts away the http layer between the code using the client and the api server, b) not about analyzing every little detail about the REST API in use.
+
+### A word about this test setup
+Since this setup doesn't allow testing for 5xx status codes, timeouts, etc, I'd usually want to enhance this with an in-memory mock-api. However I deemed it out of scope for this exercise.
+
+### Structure
+I'm unsure about the file structure and partly file naming in this submission, mostly because I'm not yet familiar with the best practices in golang.
+
+
+## Original text
 Engineers at Form3 build highly available distributed systems in a microservices environment. Our take home test is designed to evaluate real world activities that are involved with this role. We recognise that this may not be as mentally challenging and may take longer to implement than some algorithmic tests that are often seen in interview exercises. Our approach however helps ensure that you will be working with a team of engineers with the necessary practical skills for the role (as well as a diverse range of technical wizardry). 
 
 ## Instructions
