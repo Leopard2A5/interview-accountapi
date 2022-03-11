@@ -1,3 +1,6 @@
+// Provides some basic CRUD functions for interacting with the account api.
+// Generally speaking, errors are divided into ClientErrors and ServerErrors, where ClientErrors represent
+// status codes > 399 < 500 and ServerErrors are status codes >= 500.
 package accounts
 
 import (
@@ -10,7 +13,7 @@ import (
 	"strings"
 )
 
-// Send an account creation request to the API, returning the resulting account object.
+// CreateAccount sends an account creation request to the API, returning the resulting account object.
 // Callers should use the returned object and not the one given to this function to ensure
 // any fields populated by the API are present in the following code.
 func CreateAccount(input *AccountData) (*AccountData, error) {
@@ -38,7 +41,7 @@ func CreateAccount(input *AccountData) (*AccountData, error) {
 	return &ret, nil
 }
 
-// Fetch the account with the given uuid. If the account doesn't exist the function will return (nil, nil).
+// FetchAccount fetches the account with the given uuid. If the account doesn't exist the function will return (nil, nil).
 func FetchAccount(accountId string) (*AccountData, error) {
 	path := fmt.Sprintf("/organisation/accounts/%v", accountId)
 
@@ -67,7 +70,41 @@ func FetchAccount(accountId string) (*AccountData, error) {
 	return nil, fmt.Errorf("unexpected status code %d: %v", resp.StatusCode, string(bytes))
 }
 
-// builds a complete url from the env var BASEURL + the given path.
+// DeleteAccount deletes the account with the given ID and given version number. If the given resource cannot be found
+// this will return a ClientError wrapping a 404 statusCode. A possibly useful improvement here would be to
+// define a constant ClientError for the 404 case, because clients may want to tolerate 404's and not treat them
+// at all. Didn't implement this because I didn't want to make an assumption on the usefulness of this.
+func DeleteAccount(accountId string, version int64) error {
+	path := fmt.Sprintf("/organisation/accounts/%v?version=%d", accountId, version)
+	client := &http.Client{}
+
+	req, err := http.NewRequest(http.MethodDelete, buildUrl(path), nil)
+	if err != nil {
+		return &ConnectionError{err}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return &ConnectionError{err}
+	}
+	defer resp.Body.Close()
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return &ConnectionError{err}
+	}
+
+	if resp.StatusCode > 299 && resp.StatusCode < 500 {
+		return &ClientError{StatusCode: resp.StatusCode, Message: string(bytes)}
+	}
+	if resp.StatusCode >= 500 {
+		return &ServerError{StatusCode: resp.StatusCode, Message: string(bytes)}
+	}
+
+	return nil
+}
+
+// buildUrl builds a complete url from the env var BASEURL + the given path.
 // trailing / in baseUrl and leading / in path will be taken into account.
 func buildUrl(path string) string {
 	baseUrl, ok := os.LookupEnv("BASEURL")
@@ -88,7 +125,7 @@ func buildUrl(path string) string {
 	return fmt.Sprintf("%v/%v", baseUrl, path)
 }
 
-// marshal the given AccountData into a Request, as json, in a []byte.
+// marshal will marshal the given AccountData into a Request, as json, in a []byte.
 // will panic if marshalling fails.
 func marshal(input *AccountData) []byte {
 	req := Request{
@@ -103,7 +140,7 @@ func marshal(input *AccountData) []byte {
 	return body
 }
 
-// unmarshal an AccountData from a Response, encoded as a JSON []byte.
+// unmarshal will unmarshal an AccountData from a Response, encoded as a JSON []byte.
 // will panic if unmarshalling fails
 func unmarshal(input []byte) AccountData {
 	var ret Response

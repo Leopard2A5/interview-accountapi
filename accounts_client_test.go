@@ -65,6 +65,38 @@ func TestFetchAccountNotFound(t *testing.T) {
 	}
 }
 
+func TestDeleteAccountInvalidId(t *testing.T) {
+	clientError := &ClientError{}
+
+	err := DeleteAccount("not-a-uuid", 1)
+	if !errors.As(err, &clientError) {
+		t.Fatalf("expected error of type %T, but got %T", clientError, err)
+	}
+}
+
+func TestDeleteAccountNotFound(t *testing.T) {
+	clientError := &ClientError{}
+
+	err := DeleteAccount(uuid.NewString(), 1)
+	if !errors.As(err, &clientError) {
+		t.Fatalf("expected error of type %T, but got %T", clientError, err)
+	}
+}
+
+func TestDeleteAccountHappyCase(t *testing.T) {
+	input := newAccount()
+
+	account, err := CreateAccount(&input)
+	if err != nil {
+		t.Fatalf("failed to create test account: %v", err)
+	}
+
+	err = DeleteAccount(account.ID, *account.Version)
+	if err != nil {
+		t.Fatalf("expected nil, got %v", err)
+	}
+}
+
 func TestBuildUrlShouldCorrectlyConcat(t *testing.T) {
 	const expectation = "http://localhost:8080/v1/foo"
 
