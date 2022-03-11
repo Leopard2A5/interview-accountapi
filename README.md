@@ -14,6 +14,9 @@ Since this setup doesn't allow testing for 5xx status codes, timeouts, etc, I'd 
 ### Structure
 I'm unsure about the file structure and partly file naming in this submission, mostly because I'm not yet familiar with the best practices in golang.
 
+### Timeouts
+For a production-ready library I'd expect timeouts to be a configurable thing, so that's something that's missing from this submission. I didn't deem it in-scope for this exercise.
+
 
 ## Original text
 Engineers at Form3 build highly available distributed systems in a microservices environment. Our take home test is designed to evaluate real world activities that are involved with this role. We recognise that this may not be as mentally challenging and may take longer to implement than some algorithmic tests that are often seen in interview exercises. Our approach however helps ensure that you will be working with a team of engineers with the necessary practical skills for the role (as well as a diverse range of technical wizardry). 
