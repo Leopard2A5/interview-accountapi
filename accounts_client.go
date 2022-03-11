@@ -128,7 +128,7 @@ func buildUrl(path string) string {
 // marshal will marshal the given AccountData into a Request, as json, in a []byte.
 // will panic if marshalling fails.
 func marshal(input *AccountData) []byte {
-	req := Request{
+	req := Payload{
 		Data: input,
 	}
 
@@ -143,7 +143,7 @@ func marshal(input *AccountData) []byte {
 // unmarshal will unmarshal an AccountData from a Response, encoded as a JSON []byte.
 // will panic if unmarshalling fails
 func unmarshal(input []byte) AccountData {
-	var ret Response
+	var ret Payload
 
 	err := json.Unmarshal(input, &ret)
 	if err != nil {
@@ -153,10 +153,7 @@ func unmarshal(input []byte) AccountData {
 	return *ret.Data
 }
 
-type Request struct {
-	Data *AccountData `json:"data"`
-}
-
-type Response struct {
+// Payload is a wrapper for the accounts api.
+type Payload struct {
 	Data *AccountData `json:"data"`
 }
